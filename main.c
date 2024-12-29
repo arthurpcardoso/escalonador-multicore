@@ -24,10 +24,8 @@ int main() {
 
         int tempo = 0;
 
-    // Procura o número ao final da string
         sscanf(arquivo_executavel, "%*[^0-9]%d", &tempo);
 
-        printf("tempo: %d\n", tempo);
     }
     
 
