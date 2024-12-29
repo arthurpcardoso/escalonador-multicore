@@ -17,10 +17,17 @@ int main() {
     // le as linhas do arquivo
     char linha[100];
     while (fgets(linha, 100, entrada) != NULL) {
-        char identificador[50], arquivo_executavel[50];
+        char identificador[3], arquivo_executavel[50];
         int tempo_inicio, prioridade;
 
         sscanf(linha, "%s %s %d %d", identificador, arquivo_executavel, &tempo_inicio, &prioridade);
+
+        int tempo = 0;
+
+    // Procura o número ao final da string
+        sscanf(arquivo_executavel, "%*[^0-9]%d", &tempo);
+
+        printf("tempo: %d\n", tempo);
     }
     
 
