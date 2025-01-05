@@ -10,6 +10,13 @@ typedef struct {
     int tempo_final;
 } Processo;
 
+Fila fila_prioridade_0;
+Fila fila_prioridade_1;
+Fila fila_prioridade_2;
+Fila fila_prioridade_3;
+
+int prox_processo();
+
 int main() {
 
     // Entrada do n_cores e quantum
@@ -20,12 +27,6 @@ int main() {
 
     // tabela de processos
     Processo processos[100];
-
-    // Filas
-    Fila fila_prioridade_0;
-    Fila fila_prioridade_1;
-    Fila fila_prioridade_2;
-    Fila fila_prioridade_3;
 
      // Ler o comando completo
     scanf("%s %d %d", comando, &n_cores, &quantum);
@@ -74,4 +75,21 @@ int main() {
     
 
     return 0;
+}
+
+int prox_processo() {
+    // retorna o proximo processo a ser executado
+
+    if (!estaVazia(&fila_prioridade_0)) {
+        return desenfileirar(&fila_prioridade_0);
+    } else if (!estaVazia(&fila_prioridade_1)) {
+        return desenfileirar(&fila_prioridade_1);
+    } else if (!estaVazia(&fila_prioridade_2)) {
+        return desenfileirar(&fila_prioridade_2);
+    } else if (!estaVazia(&fila_prioridade_3)) {
+        return desenfileirar(&fila_prioridade_3);
+    }
+    else {
+        return -1;
+    }
 }
