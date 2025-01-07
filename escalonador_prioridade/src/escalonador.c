@@ -44,6 +44,7 @@ void executar_processos() {
         int fila_vazia = 1;
 
         for (int prioridade = 0; prioridade < NUM_PRIORIDADES; prioridade++) {
+
             FilaPrioridade *fila = &filas[prioridade];
 
             for (int i = 0; i < fila->count; i++) {

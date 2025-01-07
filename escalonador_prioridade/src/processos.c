@@ -19,6 +19,8 @@ int ler_processos(const char *nome_arquivo, Processo processos[]) {
             &processos[count].tempo_inicio, 
             &processos[count].prioridade) == 4) {
         count++;
+
+        sscanf(processos[count].arquivo, "%*[^0-9]%d", &processos[count].tempo_execucao);
     }
 
     fclose(arquivo);

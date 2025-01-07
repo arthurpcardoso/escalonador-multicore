@@ -4,6 +4,8 @@
 
 #define MAX_PROCESSOS 100
 
+Processo processos[MAX_PROCESSOS];
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         fprintf(stderr, "Uso: %s <numero_de_cores> <quantum>\n", argv[0]);
@@ -20,11 +22,13 @@ int main(int argc, char *argv[]) {
 
     printf("Número de núcleos: %d, Quantum: %d\n", numero_de_cores, quantum);
 
-    Processo processos[MAX_PROCESSOS];
-    int num_processos = ler_processos("/home/vhvictor1/code/UNB/SO/escalonador_prioridade/input/processos.txt", processos);
+    int num_processos = ler_processos("processos.txt", processos);
+
     if (num_processos < 0) {
         return 1; 
     }
+
+    adicionar_processos(processos, num_processos);
 
     executar_processos();
 

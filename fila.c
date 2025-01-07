@@ -26,7 +26,7 @@ int estaVazia(Fila *fila) {
 // Inserir um elemento na fila
 void enfileirar(Fila *fila, int valor) {
     if (estaCheia(fila)) {
-        printf("Erro: A fila está cheia!\n");
+        //printf("Erro: A fila está cheia!\n");
         return;
     }
     fila->itens[++fila->traseira] = valor;
@@ -35,7 +35,7 @@ void enfileirar(Fila *fila, int valor) {
 // Remover um elemento da fila
 int desenfileirar(Fila *fila) {
     if (estaVazia(fila)) {
-        printf("Erro: A fila está vazia!\n");
+        //printf("Erro: A fila está vazia!\n");
         return -1; // Código de erro
     }
     return fila->itens[fila->frente++];
@@ -44,7 +44,7 @@ int desenfileirar(Fila *fila) {
 // Exibir os elementos da fila
 void exibirFila(Fila *fila) {
     if (estaVazia(fila)) {
-        printf("A fila está vazia.\n");
+        //printf("A fila está vazia.\n");
         return;
     }
     printf("Fila: ");
