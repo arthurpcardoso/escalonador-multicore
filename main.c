@@ -142,6 +142,9 @@ int verifica_processo_nasceu(Processo *processos, int tempo) {
     // e coloca na fila de prioridade correspondente
 
     for (int i = 0; i < 100; i++) {
+        if (procecesso[i].identificador == 0) {
+            continue;
+        }
         if (processos[i].tempo_inicio == tempo) {
             if (processos[i].prioridade == 0) {
                 enfileirar(&fila_prioridade_0, i);
