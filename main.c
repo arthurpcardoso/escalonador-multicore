@@ -35,13 +35,24 @@ int verifica_processo_nasceu(Processo *processos, int tempo,
 
 void quantum_acabou(Processo *processos, int qtd_processos);
 
-void terminou_processo(int pid);
+void terminou_processo(int pid) {
+  // Implement the function logic here
+  printf("Processo %d terminou.\n", pid);
+  // terminar processo
+  while (1);
+}
 
 void verifica_processo_terminou(Processo *processos, int tempo,
                                 int qtd_processos);
 
 bool verifica_todos_processos_terminaram(Processo *processos,
                                          int qtd_processos);
+
+void delay1segundo() {
+  // Implement the function logic here
+  long delay;
+  for (delay = 0; delay < 600000000; delay++);
+}
 
 int main() {
 
@@ -75,7 +86,7 @@ int main() {
   printf("Número de linhas: %d\n", num_linhas);
 
   // Criar vetor de processos (ou outro armazenamento)
-  Processo processos[num_linhas];
+  Processo processos[100];
 
   // Iterar exatamente pela quantidade de linhas do arquivo
   for (int i = 0; i < num_linhas; i++) {
@@ -108,20 +119,25 @@ int main() {
     if (n_cores > 0) {
       while (n_cores > 0) {
         int processo = prox_processo();
+        if (processo == -1) {
+          break;
+        }
         if (processo != 0) {
-          printf("Executando processo %d\n", processo);
           int pid = fork();
           if (pid == 0) {
+            printf("Entrei no filho");
+            processos[processo].liberado_executar = true;
             while (processos[processo].tempo_restante > 0) {
               if (processos[processo].liberado_executar) {
-                processos[processo].tempo_restante--;
                 printf("Processo %d executando\n", processo);
+                delay1segundo();
+                processos[processo].tempo_restante--;
               } else {
                 printf("Processo %d bloqueado\n", processo);
-                while (!processos[processo].liberado_executar)
-                  ;
+                while (!processos[processo].liberado_executar);
               }
             }
+            terminou_processo(processo);
             printf("Processo %d terminou\n", processo);
             n_cores--;
           } else {
@@ -145,9 +161,7 @@ int main() {
       }
 
       // delay de 1 segundo
-      long delay;
-      for (delay = 0; delay < 600000000; delay++)
-        ;
+      delay1segundo();
 
       tempo++;
       tempo_quantum++;
