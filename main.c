@@ -36,6 +36,12 @@ int verifica_processo_nasceu(Processo *processos, int tempo); // Function protot
 
 void quantum_acabou(Processo *processos);
 
+void terminou_processo(int pid);
+
+void verifica_processo_terminou(Processo *processos, int tempo);
+
+bool verifica_todos_processos_terminaram(Processo *processos);
+
 int main() {
 
     // Entrada do n_cores e quantum
@@ -96,6 +102,7 @@ int main() {
                                 while (!processos[processo].liberado_executar);
                             }
                         }
+                        printf("Processo %d terminou\n", processo);
                     n_cores--;
                 } else {
                     break;
@@ -105,7 +112,7 @@ int main() {
     
 
         // verifica se algum processo terminou
-        //...
+        verifica_processo_terminou(processos, tempo);
 
         // verifica se o quantum acabou
         if (tempo_quantum == quantum) {
@@ -114,18 +121,18 @@ int main() {
         }
 
         // verifica se todos os processos terminaram
-        //...
+        if (verifica_todos_processos_terminaram(processos)) {
+            break;
+        }
 
         // delay de 1 segundo
-        /* long delay; 
-        for (delay=0; delay<600000000; delay++); */
+        long delay; 
+        for (delay=0; delay<600000000; delay++);
 
         tempo++;
         tempo_quantum++;
     }
     }
-    
-    
 
     return 0;
 }
@@ -169,6 +176,28 @@ void quantum_acabou(Processo *processos) {
             }
         }
     }
+}
+
+void verifica_processo_terminou(Processo *processos, int tempo, int pid) {
+    // verifica na tabela de processos quais processos terminaram
+    // e coloca na fila de prioridade correspondente
+
+    for (int i = 0; i < 100; i++) {
+        if (processos[i].tempo_restante == 0) {
+            processos[i].tempo_final = tempo;
+        }
+    }
+}
+
+bool verifica_todos_processos_terminaram(Processo *processos) {
+    // verifica se todos os processos terminaram
+
+    for (int i = 0; i < 100; i++) {
+        if (processos[i].tempo_restante > 0) {
+            return false;
+        }
+    }
+    return true;
 }
 
 int prox_processo() {
