@@ -36,6 +36,7 @@ typedef struct {
     int tempo_final;
     bool liberado_executar;
     int pid;
+    bool esperando_semafaro;
 }
 Processo;
 
@@ -112,6 +113,7 @@ int main() {
 
             p.tempo_restante = p.tempo_execucao;
             p.pid = 0;
+            p.esperando_semafaro = false;
 
             processos[p.identificador] = p;
         }
