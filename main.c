@@ -69,6 +69,8 @@ void delay1segundo() {
     for (delay = 0; delay < 6000000000; delay++);
 }
 
+void espera_processos_esperarem_semafaro(Processo * processos);
+
 int main() {
     Processo * processos = mmap(NULL, sizeof(Processo) * 100, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     if (processos == MAP_FAILED) {
@@ -152,6 +154,7 @@ int main() {
         tempo++;
         tempo_quantum++;
 
+        espera_processos_esperarem_semafaro(processos);
         sem_post(semaforo_clock);
     }
 
@@ -276,7 +279,9 @@ int executa_processo(Processo * processos, int processo, int * n_cores, sem_t * 
                         terminou_processo(processo, n_cores);
                         return 0;
                     }
+                    processos[processo].esperando_semafaro = true;
                     sem_wait(semaforo_clock);
+                    processos[processo].esperando_semafaro = false;
                 } else {
                     printf("Processo %d bloqueado\n", processo);
                     printf("Cores atualizados: %d\n", * n_cores);
@@ -285,6 +290,16 @@ int executa_processo(Processo * processos, int processo, int * n_cores, sem_t * 
             }
         } else {
             return pid;
+        }
+    }
+}
+
+void espera_processos_esperarem_semafaro(Processo * processos) {
+    for (int i = 1; i < 100; i++) {
+        if (processos[i].esperando_semafaro) {
+            if (processos[i].identificador != 0) {
+                while (!processos[i].liberado_executar);
+            }
         }
     }
 }
