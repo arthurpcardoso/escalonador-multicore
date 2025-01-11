@@ -22,6 +22,8 @@
 
 #include <signal.h>
 
+#include <sys/wait.h>
+
 /*
         Alunos:
         - Arthur Pereira Cardoso 211038191
@@ -72,8 +74,9 @@ int verifica_processo_nasceu(Processo * processos, int tempo, int qtd_processos)
 void quantum_acabou(Processo * processos, int qtd_processos, Core * cores, int n_cores);
 
 void terminou_processo(int pid) {
-    printf("Processo %d terminou.\n", pid);
-    while (1);
+    // printf("Processo %d terminou.\n", pid);
+    // while (1);
+    exit(0);
 }
 
 void verifica_processo_terminou(Processo * processos, int tempo, int qtd_processos, Core * cores, int n_cores);
@@ -163,7 +166,7 @@ int main(int argc, char * argv[]) {
 
     rewind(entrada);
 
-    printf("Número de linhas: %d\n", num_linhas);
+    // printf("Número de linhas: %d\n", num_linhas);
 
     for (int i = 0; i < num_linhas; i++) {
         if (fgets(linha, sizeof(linha), entrada)) {
@@ -185,7 +188,7 @@ int main(int argc, char * argv[]) {
     int tempo_quantum = 0;
 
     while (1) {
-        printf("-----------------Tempo: %d-----------------------\n", tempo);
+        printf("------------Tempo: %d---------------\n", tempo);
 
         mandar_sinal_para_todos_cores(cores, * n_cores);
 
@@ -193,7 +196,7 @@ int main(int argc, char * argv[]) {
 
         verifica_processo_nasceu(processos, tempo, num_linhas);
 
-        printf("Verificando se os processos terminaram\n");
+        // printf("Verificando se os processos terminaram\n");
         verifica_processo_terminou(processos, tempo, num_linhas, cores, * n_cores);
 
         if (tempo_quantum == quantum) {
@@ -204,7 +207,16 @@ int main(int argc, char * argv[]) {
         verifica_se_tem_cores_disponiveis(cores, * n_cores, processos);
 
         if (verifica_todos_processos_terminaram(processos, num_linhas)) {
-            exibirFila( & ordem_execucao);
+            printf("Ordem de execução dos processos: ");
+            while (!estaVazia(& ordem_execucao))
+            {
+                int processo = desenfileirar(& ordem_execucao);
+                if (processo == 0) {
+                    continue;
+                }
+                printf("%s ," , processos[processo].arquivo_executavel);
+            }
+            printf("\n");
             break;
         }
 
@@ -238,8 +250,8 @@ int verifica_processo_nasceu(Processo * processos, int tempo, int qtd_processos)
             continue;
         }
         if (processos[i].tempo_inicio == tempo) {
-            printf("Processo %d nasceu\n", processos[i].identificador);
-            printf("Prioridade: %d\n", processos[i].prioridade);
+            // printf("Processo %d nasceu\n", processos[i].identificador);
+            // printf("Prioridade: %d\n", processos[i].prioridade);
             if (processos[i].prioridade == 0) {
                 enfileirar( & fila_prioridade_0, i);
             } else if (processos[i].prioridade == 1) {
@@ -255,7 +267,7 @@ int verifica_processo_nasceu(Processo * processos, int tempo, int qtd_processos)
 }
 
 void quantum_acabou(Processo * processos, int qtd_processos, Core * cores, int n_cores) {
-    printf("Quantum acabou\n");
+    // printf("Quantum acabou\n");
 
     for (int i = 0; i < n_cores; i++) {
         if (cores[i].ocupado) {
@@ -265,16 +277,16 @@ void quantum_acabou(Processo * processos, int qtd_processos, Core * cores, int n
                 if (processos[j].pid == cores[i].pid_processo) {
                     // enfileira o processo que estava executando
                     if (processos[j].prioridade == 0) {
-                        printf("Enfileirando processo %d na fila 0\n", j);
+                        // printf("Enfileirando processo %d na fila 0\n", j);
                         enfileirar( & fila_prioridade_0, j);
                     } else if (processos[j].prioridade == 1) {
-                        printf("Enfileirando processo %d na fila 1\n", j);
+                        // printf("Enfileirando processo %d na fila 1\n", j);
                         enfileirar( & fila_prioridade_1, j);
                     } else if (processos[j].prioridade == 2) {
-                        printf("Enfileirando processo %d na fila 2\n", j);
+                        // printf("Enfileirando processo %d na fila 2\n", j);
                         enfileirar( & fila_prioridade_2, j);
                     } else if (processos[j].prioridade == 3) {
-                        printf("Enfileirando processo %d na fila 3\n", j);
+                        // printf("Enfileirando processo %d na fila 3\n", j);
                         enfileirar( & fila_prioridade_3, j);
                     }
                 }
@@ -282,10 +294,10 @@ void quantum_acabou(Processo * processos, int qtd_processos, Core * cores, int n
         }
     }
     // print nas filas
-    exibirFila( & fila_prioridade_0);
-    exibirFila( & fila_prioridade_1);
-    exibirFila( & fila_prioridade_2);
-    exibirFila( & fila_prioridade_3);
+    // exibirFila( & fila_prioridade_0);
+    // exibirFila( & fila_prioridade_1);
+    // exibirFila( & fila_prioridade_2);
+    // exibirFila( & fila_prioridade_3);
 }
 
 void verifica_processo_terminou(Processo * processos, int tempo, int qtd_processos, Core * cores, int n_cores) {
@@ -295,11 +307,11 @@ void verifica_processo_terminou(Processo * processos, int tempo, int qtd_process
                 if (cores[j].pid_processo == processos[i].pid) {
                     cores[j].ocupado = false;
                     cores[j].pid_processo = 0;
-                    printf("Core %d liberado pq o processo %d terminou\n", j, i);
+                    // printf("Core %d liberado pq o processo %d terminou\n", j, i);
                     break;
                 }
             }
-            printf("Processo %d terminou na verificação de todos\n", i);
+            // printf("Processo %d terminou na verificação de todos\n", i);
             processos[i].liberado_executar = false;
             processos[i].tempo_final = tempo;
             processos[i].turnaround_time = processos[i].tempo_final - processos[i].tempo_inicio;
@@ -342,24 +354,27 @@ int prox_processo() {
 void verifica_se_tem_cores_disponiveis(Core * cores, int n_cores, Processo * processos) {
     for (int i = 0; i < n_cores; i++) {
         if (!cores[i].ocupado) {
-            printf("Core %d disponível\n", i);
+            // printf("Core %d disponível\n", i);
             int processo = prox_processo();
             //if (processo == 0) processo = prox_processo();
-            printf("Próximo Processo: %d\n", processo);
+            // printf("Próximo Processo: %d\n", processo);
             if (processo == -1) {
                 break;
             }
             if (processo != 0) {
                 cores[i].ocupado = true;
+                enfileirar(&ordem_execucao, processos[processo].identificador);
                 processos[processo].core = i;
                 // verificar se o processo já foi criado
                 if (processos[processo].pid == 0) {
                     int pid = fork();
                     if (pid == 0) {
-                        execucao_processo_filho(processos, processo, cores);
+                        execucao_processo_filho(processos, processo, cores); 
                     } else {
+                        int status;
                         processos[processo].pid = pid;
                         cores[i].pid_processo = pid;
+                        waitpid(-1, &status, WNOHANG); // pai espera sinal dos filhos que morreram (evitar zombies)
                     }
                 } else {
                     cores[i].pid_processo = processos[processo].pid;
@@ -396,12 +411,12 @@ void decrementar_tempo_restante(int signum) {
 }
 
 void execucao_processo_filho(Processo * processos, int processo, Core * cores) {
-    printf("Processo %d executando\n", processo);
+    // printf("Processo %d executando\n", processo);
     signal(SIGCONT, decrementar_tempo_restante);
     while (processos[processo].tempo_restante > 0) {
         pause();
         processos[processo].tempo_restante--;
-        printf("Tempo restante do processo %d: %d\n", processo, processos[processo].tempo_restante);
+        // printf("Tempo restante do processo %d: %d\n", processo, processos[processo].tempo_restante);
         sem_post(cores[processos[processo].core].id_semaforo);
     }
     terminou_processo(processo);
