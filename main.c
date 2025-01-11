@@ -39,6 +39,7 @@ typedef struct {
     bool liberado_executar;
     int pid;
     bool esperando_semafaro;
+    int turnaround_time;
 }
 Processo;
 
@@ -48,6 +49,9 @@ Fila fila_prioridade_2;
 Fila fila_prioridade_3;
 
 int prox_processo();
+int turnaround_times[100];
+int total_turnaround_time = 0;
+int total_processos = 0;
 
 int verifica_processo_nasceu(Processo * processos, int tempo, int qtd_processos);
 
@@ -68,7 +72,7 @@ void verifica_se_tem_cores_disponiveis(int * n_cores, Processo * processos, sem_
 
 void delay1segundo() {
     long delay;
-    for (delay = 0; delay < 6000000000; delay++);
+    for (delay = 0; delay < 600000000; delay++);
 }
 
 void espera_processos_esperarem_semafaro(Processo * processos);
@@ -164,6 +168,14 @@ int main(int argc, char *argv[]) {
         sem_post(semaforo_clock);
     }
 
+    if (total_processos > 0) {
+        printf("Tempos de Turnaround dos processos:\n");
+        for (int i = 0; i < total_processos; i++) {
+            printf("Processo %d: Tempo de Turnaround: %d\n", processos[i].identificador, processos[i].turnaround_time);
+        }
+        printf("Tempo médio de turnaround: %.2f\n", (float)total_turnaround_time / total_processos);
+    }
+
     return 0;
 }
 
@@ -217,6 +229,11 @@ void verifica_processo_terminou(Processo * processos, int tempo, int qtd_process
             printf("Cores atualizados pq o processo %d terminou: %d\n", i, * n_cores);
             processos[i].liberado_executar = false;
             processos[i].tempo_final = tempo;
+            processos[i].tempo_final = tempo; 
+            processos[i].turnaround_time = processos[i].tempo_final - processos[i].tempo_inicio; 
+            turnaround_times[total_processos] = processos[i].turnaround_time; 
+            total_turnaround_time += processos[i].turnaround_time; 
+            total_processos++;
         }
     }
 }
