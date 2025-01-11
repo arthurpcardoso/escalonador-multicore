@@ -1,23 +1,14 @@
 #include "fila.h"
 
 #include <stdbool.h>
-
 #include <stdio.h>
-
 #include <sys/types.h>
-
 #include <sys/mman.h>
-
 #include <fcntl.h>
-
 #include <unistd.h>
-
 #include <sys/shm.h>
-
 #include <sys/ipc.h>
-
 #include <semaphore.h>
-
 #include <stdlib.h>
 
 /*
