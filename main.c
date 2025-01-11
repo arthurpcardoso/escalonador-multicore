@@ -18,6 +18,8 @@
 
 #include <semaphore.h>
 
+#include <stdlib.h>
+
 /*
   Alunos:
   - Arthur Pereira Cardoso 211038191
@@ -71,7 +73,7 @@ void delay1segundo() {
 
 void espera_processos_esperarem_semafaro(Processo * processos);
 
-int main() {
+int main(int argc, char *argv[]) {
     Processo * processos = mmap(NULL, sizeof(Processo) * 100, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     if (processos == MAP_FAILED) {
         perror("mmap");
@@ -85,9 +87,13 @@ int main() {
     }
 
     int quantum;
-    char comando[10];
-
-    scanf("%s %d %d", comando, n_cores, & quantum);
+    if (argc != 3) {
+        fprintf(stderr, "Uso: %s <numero_de_cores> <quantum>\n", argv[0]);
+        return 1;
+    }
+    
+    *n_cores = atoi(argv[1]);
+    quantum = atoi(argv[2]);
 
     FILE * entrada = fopen("entrada.txt", "r");
     if (!entrada) {
