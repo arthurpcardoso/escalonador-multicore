@@ -29,17 +29,19 @@
 */
 
 typedef struct {
-        int identificador;
-        char arquivo_executavel[50];
-        int tempo_inicio;
-        int prioridade;
-        int tempo_execucao;
-        int tempo_restante;
-        int tempo_final;
-        bool liberado_executar;
-        int pid;
-        bool esperando_semafaro;
-} Processo;
+    int identificador;
+    char arquivo_executavel[50];
+    int tempo_inicio;
+    int prioridade;
+    int tempo_execucao;
+    int tempo_restante;
+    int tempo_final;
+    bool liberado_executar;
+    int pid;
+    bool esperando_semafaro;
+    int turnaround_time;
+}
+Processo;
 
 Fila fila_prioridade_0;
 Fila fila_prioridade_1;
@@ -49,6 +51,10 @@ Fila fila_prioridade_3;
 Fila ordem_execucao;
 
 int prox_processo();
+int turnaround_times[100];
+int total_turnaround_time = 0;
+int total_processos = 0;
+int processos_finalizados[100];
 
 int verifica_processo_nasceu(Processo * processos, int tempo, int qtd_processos);
 
@@ -68,8 +74,8 @@ int executa_processo(Processo * processos, int processo, int * n_cores, sem_t * 
 void verifica_se_tem_cores_disponiveis(int * n_cores, Processo * processos, sem_t * semaforo_clock);
 
 void delay1segundo() {
-        long delay;
-        for (delay = 0; delay < 600000000; delay++);
+    long delay;
+    for (delay = 0; delay < 600000000; delay++);
 }
 
 void espera_processos_esperarem_semafaro(Processo * processos);
@@ -174,7 +180,17 @@ int main(int argc, char *argv[]) {
                 sem_post(semaforo_clock);
         }
 
-        return 0;
+        if (total_processos > 0) {
+        printf("Tempos de Turnaround dos processos:\n");
+        for (int i = 0; i < total_processos + 1; i++) {
+            int processo_id = processos_finalizados[i];
+            printf("Processo %d: Tempo de Turnaround: %d\n", processos[processo_id].identificador, processos[processo_id].turnaround_time);
+        }
+        printf("Tempo médio de turnaround: %.2f\n", (float)total_turnaround_time / total_processos);
+    }
+
+    return 0;
+
 }
 
 int verifica_processo_nasceu(Processo * processos, int tempo, int qtd_processos) {
@@ -221,14 +237,20 @@ void quantum_acabou(Processo * processos, int qtd_processos, int * n_cores) {
 }
 
 void verifica_processo_terminou(Processo * processos, int tempo, int qtd_processos, int * n_cores) {
-        for (int i = 1; i < qtd_processos + 1; i++) {
-                if (processos[i].tempo_restante == 0 && processos[i].tempo_final == 0) {
-                        ( * n_cores) ++;
-                        printf("Cores atualizados pq o processo %d terminou: %d\n", i, * n_cores);
-                        processos[i].liberado_executar = false;
-                        processos[i].tempo_final = tempo;
-                }
+    for (int i = 1; i < qtd_processos + 1; i++) {
+        if (processos[i].tempo_restante == 0 && processos[i].tempo_final == 0) {
+            ( * n_cores) ++;
+            printf("Cores atualizados pq o processo %d terminou: %d\n", i, * n_cores);
+            processos[i].liberado_executar = false;
+            processos[i].tempo_final = tempo;
+            processos[i].tempo_final = tempo; 
+            processos[i].turnaround_time = processos[i].tempo_final - processos[i].tempo_inicio; 
+            turnaround_times[total_processos] = processos[i].turnaround_time; 
+            total_turnaround_time += processos[i].turnaround_time; 
+            total_processos++;
+            processos_finalizados[total_processos] = i;
         }
+    }
 }
 
 bool verifica_todos_processos_terminaram(Processo * processos, int qtd_processos) {
